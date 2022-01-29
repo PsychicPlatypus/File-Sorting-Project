@@ -5,15 +5,18 @@ from pathlib import Path
 import os
 import time
 
-DOWNLOAD_PATH = "C:\DummyOne"
-FOLDER_DESTINATION = "C:\Dummy"
-
 class FileHandler(FileSystemEventHandler):
     def on_modified(self, event):
         for filename in os.listdir(DOWNLOAD_PATH):
-            src = DOWNLOAD_PATH + "\\" + filename
-            new_destination = FOLDER_DESTINATION + "\\" + filename
+            src = Path(DOWNLOAD_PATH + "/" + filename)
+            print(src)
+            new_destination = Path(FOLDER_DESTINATION + "/" + filename)
+            print(new_destination)
             os.rename(src, new_destination)
+
+
+DOWNLOAD_PATH = Path("/DummyOne")
+FOLDER_DESTINATION = Path("/Dummy")
 
 
 def main():
