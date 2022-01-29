@@ -3,34 +3,43 @@ from watchdog.events import FileSystemEventHandler
 from pathlib import Path
 
 import os
+import shutil
 import time
+import imghdr
 
-class FileHandler(FileSystemEventHandler):
-    def on_modified(self, event):
-        for filename in os.listdir(DOWNLOAD_PATH):
-            src = Path(DOWNLOAD_PATH + "/" + filename)
-            print(src)
-            new_destination = Path(FOLDER_DESTINATION + "/" + filename)
-            print(new_destination)
-            os.rename(src, new_destination)
+class Handler(FileSystemEventHandler):
+	def __init__(self):
+		self.__HOME = str(Path.home())
+		self.pdf_dst = os.path.join(self.__HOME, "Documents")
+		self.img_dst = os.path.join(self.__HOME, "Pictures")
+		self.dummy = Path("C:\Dummy")
+		self.tracked = os.path.join(self.__HOME, "Downloads")
+		os.chdir(self.tracked)
+
+	def on_modified(self, event):
+		if os.path.isfile(event.src_path) and not event.src_path.endswith(".part"):
+			_, extension = os.path.splitext(event.src_path)
+			if extension == ".pdf":
+				self.move_file(src=event.src_path, dst=self.pdf_dst)
+			elif imghdr.what(event.src_path) and os.path.basename(event.src_path) in os.listdir(os.getcwd()):
+				self.move_file(src=event.src_path, dst=self.img_dst)
+			else: self.move_file(src=event.src_path, dst=self.dummy)
+
+	@staticmethod
+	def move_file(src, dst):
+		file = os.path.basename(src)
+		dst = os.path.join(dst, file)
+		shutil.move(src=src, dst=dst)
 
 
-DOWNLOAD_PATH = Path("/DummyOne")
-FOLDER_DESTINATION = Path("/Dummy")
+event_handler = Handler()
+observer = Observer()
+observer.schedule(event_handler, event_handler.tracked, recursive=True)
+observer.start()
 
-
-def main():
-    event_handler = FileHandler()
-    observer = Observer()
-    observer.schedule(event_handler, DOWNLOAD_PATH, FOLDER_DESTINATION)
-    print("Press CTRL - C to QUIT")
-    try:
-        while True:
-            print("Handling")
-            time.sleep(10)
-    except KeyboardInterrupt:
-        observer.stop
-        observer.join
-
-if __name__ == "__main__":
-    main()
+try:
+	while True:
+		time.sleep(10)
+except KeyboardInterrupt:
+	observer.stop()
+	observer.join()
