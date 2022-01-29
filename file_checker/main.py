@@ -1,5 +1,3 @@
-import re
-from tabnanny import check
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from pathlib import Path
@@ -19,7 +17,6 @@ class Handler(FileSystemEventHandler):
 
 	def on_modified(self, event):
 		if os.path.isfile(event.src_path) and not event.src_path.endswith(".part"):
-			print(self.books)
 			_, extension = os.path.splitext(event.src_path)
 			if extension == ".pdf":
 				if self.check_pdf(event.src_path):
