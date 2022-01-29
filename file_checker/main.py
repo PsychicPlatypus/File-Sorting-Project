@@ -1,9 +1,10 @@
+import re
+from tabnanny import check
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from pathlib import Path
-
-import requests, PyPDF2, io, os 
-import shutil, time, imghdr
+ 
+import shutil, time, imghdr, os, fitz
 
 class Handler(FileSystemEventHandler):
 	def __init__(self):
@@ -11,16 +12,20 @@ class Handler(FileSystemEventHandler):
 		self.pdf_dst = os.path.join(self.__HOME, "Documents")
 		self.img_dst = os.path.join(self.__HOME, "Pictures")
 		self.tracked = os.path.join(self.__HOME, "Downloads")
-		self.dummy = Path("C:\Dummy")
-		self.books = os.path.join(self.__HOME, 'Desktop')
+		self.dummy = Path("C:\Default")
+		self.books = os.path.join(self.__HOME, 'Books')
 
 		os.chdir(self.tracked)
 
 	def on_modified(self, event):
 		if os.path.isfile(event.src_path) and not event.src_path.endswith(".part"):
+			print(self.books)
 			_, extension = os.path.splitext(event.src_path)
 			if extension == ".pdf":
-				self.move_file(src=event.src_path, dst=self.pdf_dst)
+				if self.check_pdf(event.src_path):
+					self.move_file(src=event.src_path, dst=self.books)
+				else:
+					self.move_file(src=event.src_path, dst=self.pdf_dst)
 			elif imghdr.what(event.src_path) and os.path.basename(event.src_path) in os.listdir(os.getcwd()):
 				self.move_file(src=event.src_path, dst=self.img_dst)
 			else: self.move_file(src=event.src_path, dst=self.dummy)
@@ -30,6 +35,14 @@ class Handler(FileSystemEventHandler):
 		file = os.path.basename(src)
 		dst = os.path.join(dst, file)
 		shutil.move(src=src, dst=dst)
+  
+	@staticmethod
+	def check_pdf(path_pdf):
+		text = ""
+		with fitz.open(path_pdf) as doc:
+			for page in doc:
+				text += page.get_text()
+				return len(text) > 1000
 
 
 
