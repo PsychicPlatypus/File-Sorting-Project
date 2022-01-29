@@ -2,18 +2,18 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from pathlib import Path
 
-import os
-import shutil
-import time
-import imghdr
+import requests, PyPDF2, io, os 
+import shutil, time, imghdr
 
 class Handler(FileSystemEventHandler):
 	def __init__(self):
 		self.__HOME = str(Path.home())
 		self.pdf_dst = os.path.join(self.__HOME, "Documents")
 		self.img_dst = os.path.join(self.__HOME, "Pictures")
-		self.dummy = Path("C:\Dummy")
 		self.tracked = os.path.join(self.__HOME, "Downloads")
+		self.dummy = Path("C:\Dummy")
+		self.books = os.path.join(self.__HOME, 'Desktop')
+
 		os.chdir(self.tracked)
 
 	def on_modified(self, event):
@@ -30,6 +30,7 @@ class Handler(FileSystemEventHandler):
 		file = os.path.basename(src)
 		dst = os.path.join(dst, file)
 		shutil.move(src=src, dst=dst)
+
 
 
 event_handler = Handler()
