@@ -7,11 +7,14 @@ import shutil, time, imghdr, os, fitz
 class Handler(FileSystemEventHandler):
 	def __init__(self):
 		self.__HOME = str(Path.home())
-		self.pdf_dst = os.path.join(self.__HOME, "Documents")
-		self.img_dst = os.path.join(self.__HOME, "Pictures")
+		if not os.path.isdir(os.path.join(self.__HOME, "File_Handler")):
+			self.create_folders()
+		self.main_dir = os.path.join(self.__HOME, "File_Handler")
+		self.pdf_dst = os.path.join(self.main_dir, "PDFs")
+		self.img_dst = os.path.join(self.main_dir, "Pictures")
+		self.other_dst = os.path.join(self.main_dir, "Other")
+		self.zip_dst = os.path.join(self.main_dir, "ZIPs")
 		self.tracked = os.path.join(self.__HOME, "Downloads")
-		self.dummy = Path("C:\Default")
-		self.books = os.path.join(self.__HOME, 'Books')
 
 		os.chdir(self.tracked)
 
@@ -19,28 +22,29 @@ class Handler(FileSystemEventHandler):
 		if os.path.isfile(event.src_path) and not event.src_path.endswith(".part"):
 			_, extension = os.path.splitext(event.src_path)
 			if extension == ".pdf":
-				if self.check_pdf(event.src_path):
-					self.move_file(src=event.src_path, dst=self.books)
-				else:
-					self.move_file(src=event.src_path, dst=self.pdf_dst)
+				self.move_file(src=event.src_path, dst=self.pdf_dst)
 			elif imghdr.what(event.src_path) and os.path.basename(event.src_path) in os.listdir(os.getcwd()):
 				self.move_file(src=event.src_path, dst=self.img_dst)
-			else: self.move_file(src=event.src_path, dst=self.dummy)
+			elif extension == ".zip":
+				self.move_file(src=event.src_path, dst=self.zip_dst)
+			elif extension != ".tmp": 
+				self.move_file(src=event.src_path, dst=self.other_dst)
+
+	@staticmethod
+	def create_folders():
+		home = str(Path.home())
+		main_path = os.path.join(home, "File_Handler")
+		os.mkdir(main_path)
+		os.mkdir(os.path.join(main_path, "PDFs"))
+		os.mkdir(os.path.join(main_path, "Pictures"))
+		os.mkdir(os.path.join(main_path, "Other"))
+		os.mkdir(os.path.join(main_path, "ZIPs"))
 
 	@staticmethod
 	def move_file(src, dst):
 		file = os.path.basename(src)
 		dst = os.path.join(dst, file)
 		shutil.move(src=src, dst=dst)
-  
-	@staticmethod
-	def check_pdf(path_pdf):
-		text = ""
-		with fitz.open(path_pdf) as doc:
-			for page in doc:
-				text += page.get_text()
-				return len(text) > 1000
-
 
 
 event_handler = Handler()
