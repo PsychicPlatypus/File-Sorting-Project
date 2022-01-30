@@ -6,16 +6,16 @@ import shutil, time, imghdr, os
 
 class Handler(FileSystemEventHandler):
 	def __init__(self):
-		self.__HOME = str(Path.home())
-		if not os.path.isdir(os.path.join(self.__HOME, "File_Handler")):
+		self.__home_main = str(Path.home())
+		if not os.path.isdir(os.path.join(self.__home_main, "File_Handler")):
 			self.create_folders()
-		self.main_dir = os.path.join(self.__HOME, "File_Handler")
+		self.main_dir = os.path.join(self.__home_main, "File_Handler")
 		self.pdf_dst = os.path.join(self.main_dir, "PDFs")
 		self.img_dst = os.path.join(self.main_dir, "Pictures")
 		self.other_dst = os.path.join(self.main_dir, "Other")
 		self.zip_dst = os.path.join(self.main_dir, "ZIPs")
 		self.music_dst = os.path.join(self.main_dir, "Music")
-		self.tracked = os.path.join(self.__HOME, "Downloads")
+		self.tracked = os.path.join(self.__home_main, "Downloads")
 
 		self.directions = {".pdf": self.pdf_dst, ".zip": self.zip_dst, ".7z": self.zip_dst, ".mp3": self.music_dst,
                      ".m4a": self.music_dst, ".FLAC": self.music_dst, ".WAV": self.music_dst}
