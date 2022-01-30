@@ -2,7 +2,7 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from pathlib import Path
  
-import shutil, time, imghdr, os, fitz
+import shutil, time, imghdr, os
 
 class Handler(FileSystemEventHandler):
 	def __init__(self):
@@ -19,7 +19,8 @@ class Handler(FileSystemEventHandler):
 		os.chdir(self.tracked)
 
 	def on_modified(self, event):
-		if os.path.isfile(event.src_path) and not event.src_path.endswith(".part"):
+		#TODO: Make the function work on downloading files
+		if os.path.isfile(event.src_path) and not event.src_path.endswith(".tmp"):
 			_, extension = os.path.splitext(event.src_path)
 			if extension == ".pdf":
 				self.move_file(src=event.src_path, dst=self.pdf_dst)
