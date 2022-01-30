@@ -50,12 +50,12 @@ class Handler(FileSystemEventHandler):
 		dst = os.path.join(dst, file)
 		shutil.move(src=src, dst=dst)
 
-
 event_handler = Handler()
 observer = Observer()
 observer.schedule(event_handler, event_handler.tracked, recursive=True)
 observer.start()
 
+print("CTRL + C to exit...")
 try:
 	while True:
 		time.sleep(10)
