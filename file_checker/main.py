@@ -14,20 +14,22 @@ class Handler(FileSystemEventHandler):
 		self.img_dst = os.path.join(self.main_dir, "Pictures")
 		self.other_dst = os.path.join(self.main_dir, "Other")
 		self.zip_dst = os.path.join(self.main_dir, "ZIPs")
+		self.music_dst = os.path.join(self.main_dir, "Music")
 		self.tracked = os.path.join(self.__HOME, "Downloads")
 
+		self.directions = {".pdf": self.pdf_dst, ".zip": self.zip_dst, ".7z": self.zip_dst, ".mp3": self.music_dst,
+                     ".m4a": self.music_dst, ".FLAC": self.music_dst, ".WAV": self.music_dst}
 		os.chdir(self.tracked)
+
 
 	def on_modified(self, event):
 		#TODO: Make the function work on downloading files
 		if os.path.isfile(event.src_path) and not event.src_path.endswith(".tmp"):
 			_, extension = os.path.splitext(event.src_path)
-			if extension == ".pdf":
-				self.move_file(src=event.src_path, dst=self.pdf_dst)
+			if extension in self.directions.keys():
+				self.move_file(src=event.src_path, dst=self.directions.get(extension))
 			elif imghdr.what(event.src_path) and os.path.basename(event.src_path) in os.listdir(os.getcwd()):
 				self.move_file(src=event.src_path, dst=self.img_dst)
-			elif extension == ".zip":
-				self.move_file(src=event.src_path, dst=self.zip_dst)
 			elif extension != ".tmp": 
 				self.move_file(src=event.src_path, dst=self.other_dst)
 
@@ -40,6 +42,7 @@ class Handler(FileSystemEventHandler):
 		os.mkdir(os.path.join(main_path, "Pictures"))
 		os.mkdir(os.path.join(main_path, "Other"))
 		os.mkdir(os.path.join(main_path, "ZIPs"))
+		os.mkdir(os.path.join(main_path, "Music"))
 
 	@staticmethod
 	def move_file(src, dst):
