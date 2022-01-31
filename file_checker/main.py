@@ -1,6 +1,7 @@
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from pathlib import Path
+#pip install watchdog
  
 import shutil, time, imghdr, os
 
