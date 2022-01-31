@@ -23,8 +23,8 @@ class Handler(FileSystemEventHandler):
 
 
 	def on_modified(self, event):
-		#TODO: Make the function work on downloading files
-		if os.path.isfile(event.src_path) and not event.src_path.endswith(".tmp"):
+		#TODO: Make the function work on downloading filesr
+		if os.path.isfile(event.src_path) and not event.src_path.endswith(".tmp") and not event.src_path.endswith(".crdownload"):
 			_, extension = os.path.splitext(event.src_path)
 			if extension in self.directions.keys():
 				self.move_file(src=event.src_path, dst=self.directions.get(extension))
