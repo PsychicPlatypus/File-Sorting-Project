@@ -1,16 +1,11 @@
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-from pathlib import Path
+import shutil, time, imghdr, os, pathlib
 #pip install watchdog
- 
-import shutil, time, imghdr, os
-
-
-
 
 class Handler(FileSystemEventHandler):
 	def __init__(self):
-		self.__home_main = str(Path.home())
+		self.__home_main = str(pathlib.Path.home())
 		if not os.path.isdir(os.path.join(self.__home_main, "File_Handler")):
 			self.create_folders()
 		self.main_dir = os.path.join(self.__home_main, "File_Handler")
@@ -39,7 +34,7 @@ class Handler(FileSystemEventHandler):
 
 	@staticmethod
 	def create_folders():
-		home = str(Path.home())
+		home = str(pathlib.Path.home())
 		main_path = os.path.join(home, "File_Handler")
 		os.mkdir(main_path)
 		os.mkdir(os.path.join(main_path, "PDFs"))
@@ -54,15 +49,23 @@ class Handler(FileSystemEventHandler):
 		dst = os.path.join(dst, file)
 		shutil.move(src=src, dst=dst)
 
-event_handler = Handler()
-observer = Observer()
-observer.schedule(event_handler, event_handler.tracked, recursive=True)
-observer.start()
+def main():
+	start_time = time.time()
+	event_handler = Handler()
+	observer = Observer()
+	observer.schedule(event_handler, event_handler.tracked, recursive=True)
+	observer.start()
 
-print("CTRL + C to exit...")
-try:
-	while True:
-		time.sleep(10)
-except KeyboardInterrupt:
-	observer.stop()
-	observer.join()
+	print("CTRL + C to exit...")
+	try:
+		while True:
+			time.sleep(10)
+	except KeyboardInterrupt:
+		observer.stop()
+		observer.join()
+	print(f"Handling over.\nRuntime -> {time.time() - start_time}")
+
+
+if __name__ == "__main__":
+	main()
+ 
