@@ -5,6 +5,9 @@ from pathlib import Path
  
 import shutil, time, imghdr, os
 
+
+
+
 class Handler(FileSystemEventHandler):
 	def __init__(self):
 		self.__home_main = str(Path.home())
