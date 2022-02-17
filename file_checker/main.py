@@ -5,6 +5,7 @@ import shutil, time, imghdr, os, pathlib
 
 class Handler(FileSystemEventHandler):
 	def __init__(self):
+		#TODO: 
 		self.__home_main = str(pathlib.Path.home())
 		if not os.path.isdir(os.path.join(self.__home_main, "File_Handler")):
 			self.create_folders()
@@ -17,12 +18,11 @@ class Handler(FileSystemEventHandler):
 		self.tracked = os.path.join(self.__home_main, "Downloads")
 
 		self.directions = {".pdf": self.pdf_dst, ".zip": self.zip_dst, ".7z": self.zip_dst, ".mp3": self.music_dst,
-                     ".m4a": self.music_dst, ".FLAC": self.music_dst, ".WAV": self.music_dst}
+                    	".m4a": self.music_dst, ".FLAC": self.music_dst, ".WAV": self.music_dst}
 		os.chdir(self.tracked)
 
 
 	def on_modified(self, event):
-		#TODO: Make the function work on downloading filesr
 		if os.path.isfile(event.src_path) and not event.src_path.endswith(".tmp") and not event.src_path.endswith(".crdownload"):
 			_, extension = os.path.splitext(event.src_path)
 			if extension in self.directions.keys():
